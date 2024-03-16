@@ -17,9 +17,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.estimator.KalmanFilter;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -75,7 +78,7 @@ public class Robot extends TimedRobot {
   /**
    * Roller Claw motor controller instance.
   */
-  CANSparkBase m_rollerClaw = new CANSparkMax(8, MotorType.kBrushless);
+  WPI_VictorSPX m_rollerClaw = new WPI_VictorSPX(8);
   /**
    * Climber motor controller instance. In the stock Everybot configuration a
    * NEO is used, replace with kBrushed if using a brushed motor.
@@ -168,7 +171,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("drive", kDrive);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    CameraServer.startAutomaticCapture();
+   // CameraServer.startAutomaticCapture();
     // cam.setResolution(320, 320);
     // cam.setFPS(30);
     
@@ -215,7 +218,7 @@ public class Robot extends TimedRobot {
     m_rollerClaw.setInverted(false);
     m_climber.setInverted(false);
 
-    m_rollerClaw.setSmartCurrentLimit(60);
+    
     m_climber.setSmartCurrentLimit(60);
 
     /*
@@ -223,7 +226,7 @@ public class Robot extends TimedRobot {
      * 
      * Brake mode is best for these mechanisms
      */
-    m_rollerClaw.setIdleMode(IdleMode.kBrake);
+    m_rollerClaw.setNeutralMode(NeutralMode.Brake);
     m_climber.setIdleMode(IdleMode.kBrake);
   }
 
@@ -266,12 +269,9 @@ public class Robot extends TimedRobot {
     rightRear.setNeutralMode(NeutralMode.Brake);
     rightFront.setNeutralMode(NeutralMode.Brake);
 
-    AUTO_LAUNCH_DELAY_S = 2;
-    AUTO_DRIVE_DELAY_S = 3;
+    AUTO_LAUNCH_DELAY_S = 1;
+    AUTO_DRIVE_DELAY_S = 2;
 
-    AUTO_DRIVE_TIME_S = 2.0;
-    AUTO_DRIVE_SPEED = -0.5;
-    AUTO_LAUNCHER_SPEED = 1;
     
     /*
      * Depeding on which auton is selected, speeds for the unwanted subsystems are set to 0
@@ -291,6 +291,9 @@ public class Robot extends TimedRobot {
     {
       AUTO_DRIVE_SPEED = 0;
       AUTO_LAUNCHER_SPEED = 0;
+    }
+    else if(m_autoSelected == kLaunchAndDrive){
+
     }
 
     autonomousStartTime = Timer.getFPGATimestamp();
@@ -315,18 +318,27 @@ public class Robot extends TimedRobot {
     {
       m_launchWheel.set(AUTO_LAUNCHER_SPEED);
       m_drivetrain.arcadeDrive(0, 0);
-
+      System.out.println("1");
     }
     else if(timeElapsed < AUTO_DRIVE_DELAY_S)
     {
       m_feedWheel.set(AUTO_LAUNCHER_SPEED);
       m_drivetrain.arcadeDrive(0, 0);
+      
     }
     else if(timeElapsed < AUTO_DRIVE_DELAY_S + AUTO_DRIVE_TIME_S)
     {
+
       m_launchWheel.set(0);
       m_feedWheel.set(0);
       m_drivetrain.arcadeDrive(AUTO_DRIVE_SPEED, 0);
+
+      //if(DriverStation.getAlliance().equals(Alliance.Blue)){
+       // m_drivetrain.arcadeDrive(AUTO_DRIVE_SPEED, -0.15);}
+     // else if(DriverStation.getAlliance().equals(Alliance.Red)){
+      //  m_drivetrain.arcadeDrive(AUTO_DRIVE_SPEED, 0.15); }uu.
+
+      
     }
     else
     {
@@ -440,11 +452,11 @@ public class Robot extends TimedRobot {
      * 
      * After a match re-enable your robot and unspool the climb
      */
-    if(m_manipController.getPOV() == 0)
+    if(m_driverController.getRawButton(4))
     {
       m_climber.set(1);
     }
-    else if(m_manipController.getPOV() == 180)
+    else if(m_driverController.getRawButton(2))
     {
       m_climber.set(-1);
     }
@@ -464,8 +476,15 @@ public class Robot extends TimedRobot {
      * This was setup with a logitech controller, note there is a switch on the back of the
      * controller that changes how it functions
      */
-   m_drivetrain.arcadeDrive(-m_driverController.getRawAxis(1)*0.70, -m_driverController.getRawAxis(0)*0.60, false);
+   m_drivetrain.arcadeDrive(-m_driverController.getRawAxis(1)*1.0, -m_driverController.getRawAxis(4)*0.60, false);
  //m_drivetrain.tankDrive(-m_driverController.getRawAxis(1)*0.40, -m_driverController.getRawAxis(5)*0.60, false);
+
+    if(!m_driverController.getRawButton(8)){
+      m_drivetrain.arcadeDrive(-m_driverController.getRawAxis(1)*1.0, -m_driverController.getRawAxis(4)*0.60, false);
+    }
+    else{
+      m_drivetrain.arcadeDrive(-m_driverController.getRawAxis(1)*0.5, -m_driverController.getRawAxis(4)*0.60*0.5, false);
+    }   
 
   }
 }
