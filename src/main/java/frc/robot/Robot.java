@@ -32,10 +32,10 @@ public class Robot extends TimedRobot {
   /*
    * Autonomous selection options.
    */
-  private static final String kNothingAuto = "Idle";
-  private static final String kLaunchAndDrive = "Launch -> Drive";
-  private static final String kLaunch = "Launch";
-  private static final String kDrive = "Drive";
+  private static final String kNothingAuto = "do nothing";
+  private static final String kLaunchAndDrive = "launch drive";
+  private static final String kLaunch = "launch";
+  private static final String kDrive = "drive";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -155,7 +155,7 @@ public class Robot extends TimedRobot {
   /**
    * Percent output to power the climber
    */
-  static final double CLIMBER_OUTPUT_POWER = 0.5;
+  static final double CLIMER_OUTPUT_POWER = 1;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -165,11 +165,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Idle", kNothingAuto);
-    m_chooser.addOption("Launch -> Drive", kLaunchAndDrive);
-    m_chooser.addOption("Launch", kLaunch);
-    m_chooser.addOption("Drive", kDrive);
-    SmartDashboard.putData("Autonomous Choice", m_chooser);
+    m_chooser.setDefaultOption("do nothing", kNothingAuto);
+    m_chooser.addOption("launch note and drive", kLaunchAndDrive);
+    m_chooser.addOption("launch", kLaunch);
+    m_chooser.addOption("drive", kDrive);
+    SmartDashboard.putData("Auto choices", m_chooser);
 
    // CameraServer.startAutomaticCapture();
     // cam.setResolution(320, 320);
@@ -362,10 +362,10 @@ public class Robot extends TimedRobot {
      *
      * This setting is driver preference. Try setting the idle modes below to kBrake to see the difference.
      */
-    leftRear.setNeutralMode(NeutralMode.Brake);
-    leftFront.setNeutralMode(NeutralMode.Brake);
-    rightRear.setNeutralMode(NeutralMode.Brake);
-    rightFront.setNeutralMode(NeutralMode.Brake);
+    leftRear.setNeutralMode(NeutralMode.Coast);
+    leftFront.setNeutralMode(NeutralMode.Coast);
+    rightRear.setNeutralMode(NeutralMode.Coast);
+    rightFront.setNeutralMode(NeutralMode.Coast);
   }
 
   /** This function is called periodically during operator control. */
@@ -479,7 +479,7 @@ public class Robot extends TimedRobot {
    m_drivetrain.arcadeDrive(-m_driverController.getRawAxis(1)*1.0, -m_driverController.getRawAxis(4)*0.60, false);
  //m_drivetrain.tankDrive(-m_driverController.getRawAxis(1)*0.40, -m_driverController.getRawAxis(5)*0.60, false);
 
-    if(!m_driverController.getRawButton(10)){
+    if(!m_driverController.getRawButton(8)){
       m_drivetrain.arcadeDrive(-m_driverController.getRawAxis(1)*1.0, -m_driverController.getRawAxis(4)*0.60, false);
     }
     else{
